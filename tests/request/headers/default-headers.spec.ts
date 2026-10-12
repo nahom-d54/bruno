@@ -60,7 +60,7 @@ test('expands and collapses each headers accordion independently', async ({ page
     await headers.inheritedSectionToggle().click();
 
     await expect(headers.inheritedSectionToggle()).toHaveAttribute('aria-expanded', 'false');
-    await expect(headers.defaultRow('User-Agent')).not.toBeVisible();
+    await expect(headers.defaultRow('Accept')).not.toBeVisible();
     await expect(headers.requestSectionToggle()).toHaveAttribute('aria-expanded', 'true');
     await expect(headers.addRow()).toBeVisible();
   });
@@ -121,7 +121,7 @@ test('opens the inherited headers accordion whenever they are shown', async ({ p
   await test.step('Collapse inherited headers', async () => {
     await headers.inheritedSectionToggle().click();
     await expect(headers.inheritedSectionToggle()).toHaveAttribute('aria-expanded', 'false');
-    await expect(headers.defaultRow('User-Agent')).not.toBeVisible();
+    await expect(headers.defaultRow('Accept')).not.toBeVisible();
   });
 
   await test.step('Show again with the accordion open', async () => {
@@ -129,7 +129,7 @@ test('opens the inherited headers accordion whenever they are shown', async ({ p
     await headers.toggleInherited().click();
 
     await expect(headers.inheritedSectionToggle()).toHaveAttribute('aria-expanded', 'true');
-    await expect(headers.defaultRow('User-Agent')).toBeVisible();
+    await expect(headers.defaultRow('Accept')).toBeVisible();
   });
 });
 
@@ -173,22 +173,22 @@ test('hides a default header when the request defines the same name', async ({ p
   await selectRequestPaneTab(page, 'Headers');
   const headers = await showInheritedHeaders(page);
 
-  await test.step('Show the default User-Agent first', async () => {
-    await expect(headers.defaultRow('User-Agent')).toBeVisible();
+  await test.step('Show the default Accept first', async () => {
     await expect(headers.defaultRow('Accept')).toBeVisible();
+    await expect(headers.defaultRow('Accept-Encoding')).toBeVisible();
   });
 
-  await test.step('Hide the default after adding a request User-Agent', async () => {
-    await fillRequestHeaderName(page, headers.addRow(), 'User-Agent');
-    await expect(headers.requestRow('User-Agent')).toBeVisible();
-    await expect(headers.defaultRow('User-Agent')).not.toBeVisible();
-    await expect(headers.defaultRow('Accept')).toBeVisible();
+  await test.step('Hide the default after adding a request Accept', async () => {
+    await fillRequestHeaderName(page, headers.addRow(), 'Accept');
+    await expect(headers.requestRow('Accept')).toBeVisible();
+    await expect(headers.defaultRow('Accept')).not.toBeVisible();
+    await expect(headers.defaultRow('Accept-Encoding')).toBeVisible();
   });
 
   await test.step('Keep duplicate request headers visible', async () => {
-    await fillRequestHeaderName(page, headers.addRow(), 'User-Agent');
-    await expect(headers.requestRow('User-Agent')).toHaveCount(2);
-    await expect(headers.defaultRow('User-Agent')).not.toBeVisible();
+    await fillRequestHeaderName(page, headers.addRow(), 'Accept');
+    await expect(headers.requestRow('Accept')).toHaveCount(2);
+    await expect(headers.defaultRow('Accept')).not.toBeVisible();
   });
 });
 
@@ -298,15 +298,14 @@ test('sends an explicit request header instead of the matching default', async (
   await selectRequestPaneTab(page, 'Headers');
   const { headers } = buildCommonLocators(page).request;
 
-  await test.step('Add an overriding User-Agent request header', async () => {
-    await fillRequestHeaderName(page, headers.addRow(), 'User-Agent');
-    await fillRequestHeaderValue(page, headers.requestRow('User-Agent'), 'custom-ua/1.0');
+  await test.step('Add an overriding Accept-Encoding request header', async () => {
+    await fillRequestHeaderName(page, headers.addRow(), 'Accept-Encoding');
+    await fillRequestHeaderValue(page, headers.requestRow('Accept-Encoding'), 'identity');
   });
 
   await test.step('Send and confirm the explicit value wins', async () => {
     await sendRequest(page, 200);
     const body = await readResponsePreviewBody(page);
-    expect(body).toMatch(/"user-agent"\s*:\s*"custom-ua\/1\.0"/i);
-    expect(body).not.toMatch(/bruno-runtime/i);
+    expect(body).toMatch(/"accept-encoding"\s*:\s*"identity"/i);
   });
 });

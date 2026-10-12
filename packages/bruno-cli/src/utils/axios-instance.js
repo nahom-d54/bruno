@@ -4,7 +4,7 @@ const { addCookieToJar, getCookieStringForUrl } = require('./cookies');
 const { createFormData } = require('./form-data');
 const { setupProxyAgents } = require('./proxy-util');
 const { isSameOrigin, DEFAULT_MAX_REDIRECTS } = require('@usebruno/common').utils;
-const { applyOmitHeaders, shouldOmitConnection } = require('@usebruno/common');
+const { applyOmitHeaders, shouldOmitConnection, DEFAULT_USER_AGENT } = require('@usebruno/common');
 const {
   getSentHeaders,
   applyOmitConnectionToAxiosConfig,
@@ -104,11 +104,7 @@ function makeAxiosInstance({
     headers: {}
   });
 
-  // Extend common headers with User-Agent rather than replacing the object.
-  // axios.create() preserves defaults.headers.common = { Accept: 'application/json, text/plain, */*' }.
-  // Assigning a new object (= { 'User-Agent': ... }) would nuke that default, causing servers that
-  // rely on content-negotiation to receive requests with no Accept header.
-  instance.defaults.headers.common['User-Agent'] = `bruno-runtime/${CLI_VERSION}`;
+  instance.defaults.headers.common['User-Agent'] = DEFAULT_USER_AGENT;
 
   instance.interceptors.request.use((config) => {
     config.metadata = config.metadata || {};

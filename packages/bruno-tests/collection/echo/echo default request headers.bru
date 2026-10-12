@@ -13,16 +13,15 @@ post {
 tests {
   test("sends Accept header with application/json by default", function() {
     // The echo server reflects request headers back as response headers.
-    // Verifies that axios's default Accept header is not clobbered when
-    // setting User-Agent (regression for: defaults.headers.common object replacement).
+    // Verifies that axios's default Accept header is present.
     const accept = res.getHeaders()["accept"];
     expect(accept).to.be.a("string");
     expect(accept).to.include("application/json");
   });
 
-  test("sends User-Agent header with bruno-runtime prefix", function() {
+  test("sends default User-Agent header with Chrome user agent string", function() {
     const userAgent = res.getHeaders()["user-agent"];
     expect(userAgent).to.be.a("string");
-    expect(userAgent).to.match(/^bruno-runtime\//);
+    expect(userAgent).to.include("Chrome/151.0.0.0");
   });
 }

@@ -46,7 +46,8 @@ export {
   applyOmitHeaders,
   shouldOmitConnection,
   refreshExplicitHeaderNames,
-  getBrunoRuntimeUserAgent
+  DEFAULT_USER_AGENT,
+  getDefaultUserAgent
 } from './headers/default-headers';
 export type {
   BrunoDefaultHeader,
