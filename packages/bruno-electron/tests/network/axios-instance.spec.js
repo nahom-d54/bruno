@@ -35,6 +35,7 @@ const { AxiosHeaders } = require('axios');
 const { measureResponseTime, addDigestInterceptor } = require('@usebruno/requests');
 const { setupProxyAgents } = require('../../src/utils/proxy-util');
 const { makeAxiosInstance, completeOpenHop } = require('../../src/ipc/network/axios-instance');
+const { DEFAULT_USER_AGENT } = require('@usebruno/common');
 
 function createStubAdapter() {
   let capturedConfig = null;
@@ -56,24 +57,22 @@ function createStubAdapter() {
 }
 
 describe('axios-instance: default headers', () => {
-  test('setting User-Agent does not clobber the axios default Accept header', async () => {
+  test('preserves the axios default Accept header', async () => {
     const stubAdapter = createStubAdapter();
     const instance = makeAxiosInstance();
 
     await instance({ url: 'https://api.example.com/test', method: 'get', adapter: stubAdapter });
 
-    // axios.create() sets Accept by default; assigning a new object to defaults.headers.common
-    // would nuke it. Guard against that regression.
     expect(stubAdapter.getConfig().headers['Accept']).toMatch(/application\/json/);
   });
 
-  test('sets User-Agent header to bruno-runtime version', async () => {
+  test('sets default User-Agent header', async () => {
     const stubAdapter = createStubAdapter();
     const instance = makeAxiosInstance();
 
     await instance({ url: 'https://api.example.com/test', method: 'get', adapter: stubAdapter });
 
-    expect(stubAdapter.getConfig().headers['User-Agent']).toMatch(/^bruno-runtime\//);
+    expect(stubAdapter.getConfig().headers['User-Agent']).toBe(DEFAULT_USER_AGENT);
   });
 
   test('omits default headers listed in settings.omitHeaders', async () => {
@@ -85,13 +84,12 @@ describe('axios-instance: default headers', () => {
       method: 'get',
       adapter: stubAdapter,
       settings: {
-        omitHeaders: ['User-Agent', 'Accept']
+        omitHeaders: ['Accept']
       },
       __explicitHeaderNames: []
     });
 
     const headers = stubAdapter.getConfig().headers;
-    expect(headers['User-Agent']).toBeNull();
     expect(headers['Accept']).toBeNull();
   });
 
@@ -736,7 +734,7 @@ describe('axios-instance: sent headers', () => {
     expect(error.response.sentHeaders).toMatchObject({
       'Host': `127.0.0.1:${server.address().port}`,
       'Connection': 'keep-alive',
-      'User-Agent': expect.stringMatching(/^bruno-runtime\//)
+      'User-Agent': DEFAULT_USER_AGENT
     });
   });
 

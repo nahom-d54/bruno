@@ -2,7 +2,8 @@ import {
   applyOmitHeaders,
   shouldOmitConnection,
   getBrunoDefaultHeaderNames,
-  getBrunoRuntimeUserAgent,
+  getDefaultUserAgent,
+  DEFAULT_USER_AGENT,
   BRUNO_DEFAULT_HEADERS
 } from './default-headers';
 
@@ -27,6 +28,11 @@ describe('bruno default headers catalog', () => {
     ]);
   });
 
+  it('provides the default User-Agent string', () => {
+    expect(getDefaultUserAgent()).toBe(DEFAULT_USER_AGENT);
+    expect(getDefaultUserAgent()).toContain('Chrome/151.0.0.0');
+  });
+
   it('marks Host as not omittable', () => {
     const host = BRUNO_DEFAULT_HEADERS.find((header) => header.name === 'Host');
     expect(host?.omittable).toBe(false);
@@ -36,52 +42,48 @@ describe('bruno default headers catalog', () => {
     const host = BRUNO_DEFAULT_HEADERS.find((header) => header.name === 'Host');
     expect(host?.previewValue).toBe('<derived from request URL>');
   });
-
-  it('builds the runtime User-Agent', () => {
-    expect(getBrunoRuntimeUserAgent('2.14.0')).toBe('bruno-runtime/2.14.0');
-  });
 });
 
 describe('applyOmitHeaders', () => {
   it('sets omitted defaults to null', () => {
     const headers = createHeaders();
     applyOmitHeaders(headers, {
-      omitHeaders: ['User-Agent', 'Accept-Encoding']
+      omitHeaders: ['Accept', 'Accept-Encoding']
     });
 
-    expect(headers.values.get('user-agent')).toBeNull();
+    expect(headers.values.get('accept')).toBeNull();
     expect(headers.values.get('accept-encoding')).toBeNull();
   });
 
   it('does not omit Host', () => {
     const headers = createHeaders();
     applyOmitHeaders(headers, {
-      omitHeaders: ['Host', 'User-Agent']
+      omitHeaders: ['Host', 'Accept']
     });
 
     expect(headers.values.has('host')).toBe(false);
-    expect(headers.values.get('user-agent')).toBeNull();
+    expect(headers.values.get('accept')).toBeNull();
   });
 
   it('does not omit an explicit user header via omitHeaders alone', () => {
     const headers = createHeaders();
     applyOmitHeaders(headers, {
-      omitHeaders: ['User-Agent'],
-      explicitHeaderNames: ['User-Agent']
+      omitHeaders: ['Accept'],
+      explicitHeaderNames: ['Accept']
     });
 
-    expect(headers.values.has('user-agent')).toBe(false);
+    expect(headers.values.has('accept')).toBe(false);
   });
 
   it('clears an explicit header when listed in headersToDelete', () => {
     const headers = createHeaders();
     applyOmitHeaders(headers, {
-      omitHeaders: ['User-Agent'],
-      headersToDelete: ['User-Agent'],
-      explicitHeaderNames: ['User-Agent']
+      omitHeaders: ['Accept'],
+      headersToDelete: ['Accept'],
+      explicitHeaderNames: ['Accept']
     });
 
-    expect(headers.values.get('user-agent')).toBeNull();
+    expect(headers.values.get('accept')).toBeNull();
   });
 
   it('defers Connection clearing to the caller', () => {
@@ -101,7 +103,7 @@ describe('shouldOmitConnection', () => {
   });
 
   it('is false when Connection is not listed', () => {
-    expect(shouldOmitConnection({ omitHeaders: ['User-Agent'] })).toBe(false);
+    expect(shouldOmitConnection({ omitHeaders: ['Accept'] })).toBe(false);
     expect(shouldOmitConnection()).toBe(false);
   });
 
@@ -121,7 +123,7 @@ describe('shouldOmitConnection', () => {
   });
 
   it('agrees with applyOmitHeaders on the same input', () => {
-    const options = { omitHeaders: ['connection', 'User-Agent'], explicitHeaderNames: ['Accept'] };
+    const options = { omitHeaders: ['connection', 'Accept-Encoding'], explicitHeaderNames: ['Accept'] };
     const headers = createHeaders();
 
     expect(shouldOmitConnection(options)).toBe(applyOmitHeaders(headers, options).omitConnection);

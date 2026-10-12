@@ -12,9 +12,6 @@ import https from 'node:https';
  * const instance = makeAxiosInstance({
  *   maxRedirects: 0,
  *   proxy: false,
- *   headers: {
- *       "User-Agent": `bruno-runtime/_version_`
- *   },
  * });
  */
 

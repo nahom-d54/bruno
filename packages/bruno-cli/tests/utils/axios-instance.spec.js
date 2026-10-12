@@ -15,25 +15,25 @@ function createStubAdapter() {
   return adapter;
 }
 
+const { DEFAULT_USER_AGENT } = require('@usebruno/common');
+
 describe('makeAxiosInstance', () => {
-  it('setting User-Agent does not clobber the axios default Accept header', async () => {
+  it('preserves the axios default Accept header', async () => {
     const stubAdapter = createStubAdapter();
     const instance = makeAxiosInstance();
 
     await instance({ url: 'https://api.example.com/test', method: 'get', adapter: stubAdapter });
 
-    // axios.create() sets Accept by default; assigning a new object to defaults.headers.common
-    // would nuke it. Guard against that regression.
     expect(stubAdapter.getConfig().headers['Accept']).toMatch(/application\/json/);
   });
 
-  it('sets User-Agent header to bruno-runtime version', async () => {
+  it('sets default User-Agent header', async () => {
     const stubAdapter = createStubAdapter();
     const instance = makeAxiosInstance();
 
     await instance({ url: 'https://api.example.com/test', method: 'get', adapter: stubAdapter });
 
-    expect(stubAdapter.getConfig().headers['User-Agent']).toMatch(/^bruno-runtime\//);
+    expect(stubAdapter.getConfig().headers['User-Agent']).toBe(DEFAULT_USER_AGENT);
   });
 
   it('omits default headers listed in settings.omitHeaders', async () => {
@@ -45,13 +45,12 @@ describe('makeAxiosInstance', () => {
       method: 'get',
       adapter: stubAdapter,
       settings: {
-        omitHeaders: ['User-Agent', 'Accept']
+        omitHeaders: ['Accept']
       },
       __explicitHeaderNames: []
     });
 
     const headers = stubAdapter.getConfig().headers;
-    expect(headers['User-Agent']).toBeNull();
     expect(headers['Accept']).toBeNull();
   });
 

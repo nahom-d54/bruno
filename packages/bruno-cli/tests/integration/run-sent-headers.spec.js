@@ -4,6 +4,7 @@ const os = require('os');
 const path = require('path');
 const http = require('http');
 const { runCli } = require('./helpers/run-cli');
+const { DEFAULT_USER_AGENT } = require('@usebruno/common');
 
 const writeFixtureFile = (filePath, content) => {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
@@ -83,7 +84,7 @@ headers {
 ${extra}`;
 
   // Verify that every request header has been received by the server.
-  // Also verify that transport headers are sent (Host, Connection, Accept-Encoding, User-Agent).
+  // Also verify that transport headers are sent (Host, Connection, Accept-Encoding).
   it('should send all request headers to server along with transport headers', async () => {
     stageCollection(httpRequest());
 
@@ -98,7 +99,7 @@ ${extra}`;
       'Host': `127.0.0.1:${port}`,
       'Connection': 'keep-alive',
       'Accept-Encoding': 'gzip, compress, deflate, br',
-      'User-Agent': expect.stringMatching(/^bruno-runtime\//),
+      'User-Agent': DEFAULT_USER_AGENT,
       'my-header-1': 'my-value-1'
     });
   });

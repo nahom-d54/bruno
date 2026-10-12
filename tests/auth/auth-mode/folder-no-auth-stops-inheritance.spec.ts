@@ -16,7 +16,7 @@ import { AUTH_MODE_LABELS } from '../../utils/constants';
 
 const DEFAULT_SENT_HEADERS: Array<[string, string | RegExp]> = [
   ['Accept', 'application/json, text/plain, */*'],
-  ['User-Agent', /^bruno-runtime\/\S+$/],
+  ['User-Agent', /^Mozilla\/5\.0 .*/],
   ['Accept-Encoding', 'gzip, compress, deflate, br'],
   ['Host', 'testbench-sanity.usebruno.com'],
   ['Connection', 'keep-alive']

@@ -23,7 +23,7 @@ const REDIRECT_HOP_MARKERS = ['x-redirect-hop: 2', 'x-redirect-hop: 1', 'x-redir
 
 const DEFAULT_HEADERS: Array<{ name: string; value?: string; pattern?: RegExp }> = [
   { name: 'accept', value: 'application/json, text/plain, */*' },
-  { name: 'user-agent', pattern: /^bruno-runtime\// },
+  { name: 'user-agent', pattern: /^Mozilla\/5\.0 .*/ },
   { name: 'accept-encoding', value: 'gzip, compress, deflate, br' },
   { name: 'host', value: 'localhost:8081' },
   { name: 'connection', value: 'keep-alive' }

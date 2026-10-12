@@ -9,11 +9,14 @@ export type BrunoDefaultHeader = {
   source: BrunoDefaultHeaderSource;
 };
 
+export const DEFAULT_USER_AGENT =
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36';
+
 /** Headers Bruno, Axios, or Node add automatically on HTTP sends. */
 export const BRUNO_DEFAULT_HEADERS: BrunoDefaultHeader[] = [
   {
     name: 'User-Agent',
-    previewValue: 'bruno-runtime/<version>',
+    previewValue: DEFAULT_USER_AGENT,
     omittable: true,
     source: 'bruno'
   },
@@ -143,6 +146,4 @@ export const applyOmitHeaders = (
   return { omitConnection: namesToClear.includes('connection') };
 };
 
-/** User-Agent Bruno sends by default. */
-export const getBrunoRuntimeUserAgent = (version: string): string =>
-  `bruno-runtime/${version || ''}`;
+export const getDefaultUserAgent = (): string => DEFAULT_USER_AGENT;

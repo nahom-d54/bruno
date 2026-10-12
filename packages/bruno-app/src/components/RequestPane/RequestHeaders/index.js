@@ -9,7 +9,7 @@ import {
   IconEyeOff,
   IconInfoCircle
 } from '@tabler/icons';
-import { BRUNO_DEFAULT_HEADERS, getBrunoRuntimeUserAgent } from '@usebruno/common';
+import { BRUNO_DEFAULT_HEADERS, DEFAULT_USER_AGENT } from '@usebruno/common';
 import { useTheme } from 'providers/Theme';
 import {
   moveRequestHeader,
@@ -76,7 +76,7 @@ const HeaderHint = ({ id, text, className, place = 'top', testId, tooltipTestId,
 
 const getDefaultHeaderValue = (header, requestUrl) => {
   if (header.name === 'User-Agent') {
-    return getBrunoRuntimeUserAgent(appVersion);
+    return DEFAULT_USER_AGENT;
   }
 
   return header.previewValue || '';
